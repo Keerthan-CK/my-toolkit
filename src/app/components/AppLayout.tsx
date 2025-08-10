@@ -30,13 +30,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="flex flex-col min-h-screen text-white bg-black bg-opacity-80">
         <header className="h-16" />
 
-        {/* Lottie animation before radial menu */}
+        {/* Lottie animation */}
         <div className="flex justify-center mt-16 z-10 md:hidden">
           <DotLottieReact
-            src="https://lottie.host/defbabe0-b0d1-45f5-93eb-0db75020c103/a4IZ3FNYQm.lottie"
+            src="https://lottie.host/5d33e61a-0d58-4adc-8e24-0854a61ca292/N5WI25ZILI.lottie"
             loop
             autoplay
-            className=" w-50 h-50 sm:w-60 sm:h-60"
+            className="top-1 w-60 h-60 sm:w-60 sm:h-60"
           />
         </div>
 

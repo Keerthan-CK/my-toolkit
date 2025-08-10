@@ -1,4 +1,6 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.js
+const colors = require("tailwindcss/colors");
+
 module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -8,19 +10,33 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        primary: {
+          ...colors.blue, // full blue scale (50–900)
+          DEFAULT: "#2563eb", // brand blue
+          light: "#3b82f6",
+          dark: "#1e40af",
+        },
+        secondary: {
+          ...colors.amber, // full amber scale (50–900)
+          DEFAULT: "#f59e0b", // accent amber
+          light: "#fbbf24",
+          dark: "#b45309",
+        },
         brand: {
-          DEFAULT: "#2563eb", // primary blue
+          ...colors.blue,
+          DEFAULT: "#2563eb",
           light: "#3b82f6",
           dark: "#1e40af",
         },
         accent: {
-          DEFAULT: "#f59e0b", // amber
+          ...colors.amber,
+          DEFAULT: "#f59e0b",
           light: "#fbbf24",
           dark: "#b45309",
         },
       },
     },
   },
-  darkMode: "class", // enable dark mode via class on <html>
+  darkMode: "class",
   plugins: [require("@tailwindcss/typography")],
 };

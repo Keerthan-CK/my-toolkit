@@ -59,13 +59,30 @@ a {
   mix-blend-mode: normal;
 }
 
+/* ==== Background Image ==== */
+body.discount-bg {
+  background-image: url('/images/d-back.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; 
+}
+/* Hide native scrollbars */
+.scrollbar-hide {
+  -ms-overflow-style: none;  
+  scrollbar-width: none;     
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; 
+}
+
 
 @media (max-width: 640px) {
   .nav-edge-video {
   position: fixed;
   left: 50%;
   top: 0;
-  transform: translate(-50%, -80%) scale(1.6); /* Center horizontally, then double size */
+  transform: translate(-50%, -80%) scale(1.6); 
   transform-origin: top center;
   height: auto;
   object-fit: contain;
