@@ -1,0 +1,153 @@
+Alright — got it.
+We’re basically making a **single-page Apple Notes–style app** with a **space-themed dark aesthetic**, glassmorphic notes, cloud sync via Supabase + localStorage fallback, and rich text editing.
+
+Here’s the breakdown so we can execute without missing anything.
+
+---
+
+## **Functional Flow**
+
+1. **On load**
+
+   * Pull notes from Supabase.
+   * If offline, fallback to localStorage.
+   * Merge both sources (local changes override cloud if timestamps are newer).
+
+2. **Create note**
+
+   * Button/FAB → opens new editor.
+   * Auto-saves as you type.
+   * Syncs to Supabase + updates localStorage instantly.
+
+3. **Edit note**
+
+   * Rich text editor (bold, italic, underline, code block, image insert).
+   * Markdown supported internally for easy formatting.
+
+4. **Delete note**
+
+   * Soft delete locally, then sync cloud.
+
+5. **Search**
+
+   * Client-side filtering by title/content.
+
+6. **Ordering**
+
+   * Drag-and-drop grid reordering.
+   * Save order to localStorage + Supabase.
+
+---
+
+## **UI / UX Design**
+
+### **Theme**
+
+* **Background**: `bg-gradient-to-br from-gray-950 via-black to-gray-900`
+
+* **Header**: Gradient flow animation (space-like), title **“Notes”** in large neon brand gradient text.
+
+* **Cards**:
+
+  * Glassmorphic: `bg-white/5 backdrop-blur-md border border-brand-light/50`
+  * Neon glow border (`shadow-[0_0_15px_rgba(37,99,235,0.5)]` or gradient border)
+  * Fade-in animation when appearing.
+  * Hover scale: `hover:scale-[1.02]` smooth with `transition`.
+
+* **Typography**:
+
+  * Sans-serif or monospaced (`font-mono`) for body text.
+  * Headers: readable and slightly futuristic.
+
+* **Accent Colors**:
+
+  * Buttons: gradient from brand.blue → accent.amber.
+  * Hover states: more glow.
+
+### **Layout**
+
+* **Desktop**: Responsive grid (3–4 columns)
+* **Mobile**: Single column with bottom FAB
+* Floating **“+” button** → adds note (big, glowing, bottom-right)
+
+---
+
+## **Special Features**
+
+* **Empty state illustration**: Floating astronaut in center when no notes.
+* **Auto-save indicator**: glowing caret while typing.
+* **Keyboard shortcuts**:
+
+  * Ctrl+N → new note.
+  * Ctrl+S → force save (even though autosave runs).
+* **Animations**:
+
+  * Fade-in notes.
+  * Smooth grid rearrange when dragging.
+
+---
+
+## **Tech Stack & Packages**
+
+* **Editor**: [TipTap](https://tiptap.dev/) (React) → rich text + markdown + images.
+* **Drag & Drop**: `@dnd-kit/core` (lightweight, great for grid).
+* **Animations**: Framer Motion (smooth fades & scaling).
+* **Cloud**: Supabase (read/write no-auth table).
+* **Local**: `localStorage` as offline cache.
+
+---
+
+
+### **1. Rich Text Editor Choice**
+
+We’ll use **TipTap** for the rich text editing experience.
+It:
+
+* Handles **bold, italic, underline, code, images, links**.
+* Can output Markdown or HTML.
+* Supports placeholder text (“Start typing…”).
+* Is **reactive**, so you get smooth updates.
+
+---
+
+### **2. Smooth Typing Animations**
+
+We’ll layer these effects:
+
+* **CSS caret glow**:
+
+  ```css
+  .glow-caret {
+    caret-color: transparent;
+    background: linear-gradient(90deg, #3b82f6, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: caretBlink 1s infinite;
+  }
+
+  @keyframes caretBlink {
+    0%, 49% { border-right: 2px solid rgba(59, 130, 246, 0.8); }
+    50%, 100% { border-right: 2px solid transparent; }
+  }
+  ```
+* **Framer Motion fade-in for new characters** (very subtle, \~40ms).
+* Use TipTap’s `onUpdate` to trigger a micro animation on the line you’re typing in.
+
+---
+
+### **3. Performance Tweaks**
+
+* Debounce updates to Supabase (e.g., 1–2 seconds after typing stops).
+* Always update localStorage instantly so it feels snappy.
+* Only re-render the part of the document being edited.
+
+---
+
+### **4. Apple-Notes-Like Feel**
+
+* **No flicker** when you switch notes → we’ll prefetch and keep note data in memory.
+* Smooth scrolling with `scroll-behavior: smooth;`
+* Slight **content fade-in** when opening a note.
+
+---
+

@@ -76,6 +76,49 @@ body.discount-bg {
   display: none; 
 }
 
+/* smooth typing caret effect for editor wrapper */
+.editor-glow .ProseMirror {
+  caret-color: rgba(255,255,255,0.9);
+  transition: box-shadow 220ms ease;
+}
+
+/* subtle caret glow (visual) */
+.ProseMirror:focus {
+  box-shadow: 0 0 18px rgba(59,130,246,0.08);
+}
+
+/* flowing gradient text class (header) */
+.flowing-gradient {
+  background-image: linear-gradient(
+    to right,
+    #60a5fa, 
+    #f59e0b, 
+    #7c3aed
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: text-flow 4s linear infinite;
+}
+@keyframes text-flow {
+  0% { background-position: 200% 0%; }
+  100% { background-position: -200% 0%; }
+}
+
+/* small animation utility */
+.fade-up {
+  animation: fadeUp 300ms ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* hide scrollbar for mobile scrollable container */
+.scroll-hide::-webkit-scrollbar { display: none; }
+.scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 
 @media (max-width: 640px) {
   .nav-edge-video {
