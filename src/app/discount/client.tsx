@@ -2,6 +2,7 @@
 
 import React, { JSX, useState, useEffect } from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import Image from "next/image";
 
 export default function DiscountCalculator(): JSX.Element {
   const [price, setPrice] = useState<string>("");
@@ -25,8 +26,10 @@ export default function DiscountCalculator(): JSX.Element {
 
     if (isNaN(p)) return { ok: false, msg: "Enter a valid original price." };
     if (p <= 0) return { ok: false, msg: "Price must be greater than 0." };
-    if (isNaN(d)) return { ok: false, msg: "Enter a valid discount percentage." };
-    if (d < 0 || d > 100) return { ok: false, msg: "Discount must be between 0% and 100%." };
+    if (isNaN(d))
+      return { ok: false, msg: "Enter a valid discount percentage." };
+    if (d < 0 || d > 100)
+      return { ok: false, msg: "Discount must be between 0% and 100%." };
 
     const discounted = +(p * (1 - d / 100)).toFixed(2);
     return { ok: true, price: discounted };
@@ -84,9 +87,20 @@ export default function DiscountCalculator(): JSX.Element {
 
   return (
     <div className="flex flex-col items-center w-screen min-h-screen bg-cover bg-center relative overflow-hidden p-4">
-
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm z-0" aria-hidden="true" />
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm z-0"
+        aria-hidden="true"
+      />
+
+      {/* Background wallpaper */}
+      <Image
+        src="/images/discount.jpg"
+        alt="Background"
+        fill
+        className="object-cover z-0"
+        priority
+      />
 
       {/* Lottie Animation */}
       <div className="relative z-10 mt-6 sm:mt-10 flex justify-center items-center h-20 sm:h-24 sm:hidden ">
@@ -98,8 +112,8 @@ export default function DiscountCalculator(): JSX.Element {
         />
       </div>
 
-{/* Spacer for desktop */}
-<div className="hidden sm:block h-20 mt-6" />
+      {/* Spacer for desktop */}
+      <div className="hidden sm:block h-20 mt-6" />
 
       {/* Main Card */}
       <div className="relative z-10 w-full max-w-md rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-2xl p-6 sm:p-8 ring-1 ring-white/30 mt-8 sm:mt-12">
@@ -110,7 +124,10 @@ export default function DiscountCalculator(): JSX.Element {
         <form onSubmit={handleSubmit} noValidate className="space-y-6">
           {/* Original Price */}
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-white/90 mb-2">
+            <label
+              htmlFor="price"
+              className="block text-sm font-medium text-white/90 mb-2"
+            >
               Original Price
             </label>
             <input
@@ -129,7 +146,10 @@ export default function DiscountCalculator(): JSX.Element {
 
           {/* Discount Percentage */}
           <div>
-            <label htmlFor="discount" className="block text-sm font-medium text-white/90 mb-2">
+            <label
+              htmlFor="discount"
+              className="block text-sm font-medium text-white/90 mb-2"
+            >
               Discount Percentage (%)
             </label>
             <input
@@ -152,9 +172,10 @@ export default function DiscountCalculator(): JSX.Element {
             type="submit"
             disabled={loading}
             className={`w-full py-3 rounded-xl font-semibold text-gray-900 transition duration-300 focus:outline-none focus:ring-4 focus:ring-primary-300/50 shadow-lg shadow-primary-500/30
-            ${loading
-              ? "bg-white/20 text-white cursor-wait opacity-70"
-              : "bg-gradient-to-r from-primary-400 via-secondary-400 to-primary-400 hover:opacity-90"
+            ${
+              loading
+                ? "bg-white/20 text-white cursor-wait opacity-70"
+                : "bg-gradient-to-r from-primary-400 via-secondary-400 to-primary-400 hover:opacity-90"
             }`}
           >
             {loading ? (
@@ -186,9 +207,7 @@ export default function DiscountCalculator(): JSX.Element {
               </p>
               <p className="text-sm text-secondary-200 mt-1">
                 You save{" "}
-                {savings !== null
-                  ? currencyFormatter.format(savings)
-                  : "--"}
+                {savings !== null ? currencyFormatter.format(savings) : "--"}
               </p>
             </div>
           )}

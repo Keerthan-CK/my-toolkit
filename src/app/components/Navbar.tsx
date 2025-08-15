@@ -11,10 +11,11 @@ const ITEMS = [
   { id: "unit", label: "Unit", src: "/icons/unit.png", href: "/converter", colorClass: "bg-yellow-50" },
   { id: "qr", label: "QR", src: "/icons/qr-code.png", href: "/qr", colorClass: "bg-stone-950" },
   { id: "link", label: "Link", src: "/icons/https.png", href: "https://www.virustotal.com/gui/home/url", colorClass: "bg-green-500" },
-  { id: "pinterest", label: "Pinterest", src: "/icons/pinterest.png", href: "https://klickpin.com", colorClass: "bg-rose-300" },
+  { id: "pinterest", label: "Pinterest", src: "/icons/pinterest.png", href: "https://klickpin.com", colorClass: "bg-red-600" },
   { id: "fmhy", label: "Free", src: "/icons/fmhy.png", href: "https://fmhy.net", colorClass: "bg-sky-500" },
   { id: "txt", label: "Cstm Txt", src: "/icons/text.png", href: "https://tools.picsart.com/text/font-generator/", colorClass: "bg-pink-500" },
 ];
+
 
 export default function Navbar() {
   const [isMobile, setIsMobile] = useState(false);
