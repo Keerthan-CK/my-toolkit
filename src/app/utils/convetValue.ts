@@ -29,7 +29,7 @@ const volumeFactors: Record<string, number> = {
 const powerFactors: Record<string, number> = {
   hp: 745.7,
   W: 1,
-  cc: 1, // cc conversion isn't linear, placeholder for special calc
+  cc: 1, 
 };
 
 export function convertValue(

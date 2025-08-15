@@ -6,14 +6,14 @@ import Link from "next/link";
 import Navbar from "@/app/components/Navbar";
 import { FaHome } from "react-icons/fa";
 
-// Converter card data
+
 const converters = [
   { title: "Unit Converter", img: "/gifs/unit.gif", link: "/converter/unit" },
   { title: "Cooking Converter", img: "/gifs/cook.gif", link: "/converter/cooking" },
   { title: "Fuel Converter", img: "/gifs/fuel.gif", link: "/converter/fuel" },
 ];
 
-// Single reusable card component
+
 function ConverterCard({ title, img, link, index }: { title: string; img: string; link: string; index: number }) {
   return (
     

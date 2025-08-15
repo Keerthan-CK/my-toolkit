@@ -13,7 +13,7 @@ type Props = {
 };
 
 export default function NoteCard({ note, onOpen, onDelete }: Props) {
-  // derive title or first line
+ 
   const title =
     note.title ||
     note.content.replace(/<[^>]+>/g, "").slice(0, 40) ||

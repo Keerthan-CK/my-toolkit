@@ -158,10 +158,10 @@ export default function UnitConverter() {
         >
           {stateColor === "error"
             ? "That conversion doesn’t seem to work. Try another combo."
-            : `${fmt(fromValue as any)} ${
-                unitList.find((u) => u.value === fromUnit)?.label
-              } = ${fmt(toValue as any)} ${
-                unitList.find((u) => u.value === toUnit)?.label
+            : `${fmt(Number(fromValue))} ${
+                unitList.find((u) => u.value === fromUnit)?.label ?? ""
+              } = ${fmt(Number(toValue))} ${
+                unitList.find((u) => u.value === toUnit)?.label ?? ""
               }`}
         </div>
       </div>
