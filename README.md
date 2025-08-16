@@ -1,13 +1,14 @@
 #  My Productivity App
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/vercel/next.js/canary/examples/cms-wordpress/public/next-logo.svg" alt="Next.js" height="60"/>
-  <img src="https://raw.githubusercontent.com/tailwindlabs/tailwindcss/master/.github/logo-dark.svg" alt="Tailwind CSS" height="60"/>
-  <img src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-logo.svg" alt="Supabase" height="60"/>
-  <img src="https://raw.githubusercontent.com/qr-code-styling/qr-code-styling/master/media/logo.png" alt="QR Code Styling" height="60"/>
+  <img src="https://raw.githubusercontent.com/your-username/my-productivity-app/main/public/screenshots/screen1.png" alt="QR Generator" width="600" />
+  <img src="https://raw.githubusercontent.com/your-username/my-productivity-app/main/public/screenshots/screen2.png" alt="Quick Notes" width="600" />
+  <img src="https://raw.githubusercontent.com/your-username/my-productivity-app/main/public/screenshots/screen3.png" alt="Converters Hub" width="600" />
+  <img src="https://raw.githubusercontent.com/your-username/my-productivity-app/main/public/screenshots/screen4.png" alt="Discount Calculator" width="600" />
 </div>
 
-> 🚀 A modern productivity web app built with **Next.js 15 (App Router)**, **TailwindCSS**, **Supabase**, and **TypeScript**.  
+
+> 🚀 A simple productivity/tools web app built with **Next.js 15 (App Router)**, **TailwindCSS**, **Supabase**, and **TypeScript**.  
 > Includes tools like an advanced QR code generator, quick notes app, unit converters, and more.
 
 ---
@@ -39,11 +40,11 @@
 ## 📸 Screenshots
 
 <div align="center">
-  <img src="./public/screenshots/s1.png" alt="Screenshot 1" width="600"/>
-  <img src="./public/screenshots/s2.png" alt="Screenshot 2" width="600"/>
-  <img src="./public/screenshots/s3.png" alt="Screenshot 3" width="600"/>
-  <img src="./public/screenshots/s4.png" alt="Screenshot 4" width="600"/>
-  <img src="./public/screenshots/s5.png" alt="Screenshot 5" width="600"/>
+  <img src="public/screenshots/s1.png" alt="Screenshot 1" width="600"/>
+  <img src="public/screenshots/s2.png" alt="Screenshot 2" width="600"/>
+  <img src="public/screenshots/s3.png" alt="Screenshot 3" width="600"/>
+  <img src="public/screenshots/s4.png" alt="Screenshot 4" width="600"/>
+  <img src="public/screenshots/s5.png" alt="Screenshot 5" width="600"/>
 </div>
 
 ---
