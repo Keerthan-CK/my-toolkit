@@ -1,105 +1,127 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Options } from "qr-code-styling";
+import { debounce } from "lodash";
+import GradientPresets from "@/app/components/GradientPresets";
 
 import ResponsiveLayout from "@/app/components/ResponsiveLayout";
 import QrControls from "@/app/components/QrControls";
 import QrPreview from "@/app/components/QrPreview";
 import LogoUploader from "@/app/components/LogoUploader";
 import AdvancedSettings from "@/app/components/AdvancedSettings";
-
 import { embedImageInQr } from "@/app/utils/embedImageInQr";
 
 export default function QrGeneratorPage() {
-  
-  const [qrData, setQrData] = useState<string>("https://example.com");
-
- 
+  const [qrData, setQrData] = useState("https://example.com");
   const [baseOptions, setBaseOptions] = useState<Partial<Options>>({
-  dotsOptions: { color: "#000", type: "rounded" },
-  backgroundOptions: { color: "transparent" },
-});
-
-  
+    dotsOptions: { color: "#000", type: "rounded" },
+    backgroundOptions: { color: "transparent" },
+  });
   const [advancedOptions, setAdvancedOptions] = useState<Partial<Options>>({});
+  const [logoData, setLogoData] = useState<{
+    url?: string;
+    width?: number;
+    height?: number;
+  }>({});
+  const [size, setSize] = useState(300);
 
- 
-  const [logoDataUrl, setLogoDataUrl] = useState<string | undefined>(undefined);
+  /** Handle changes from QrControls */
+  const handleControlsChange = useCallback(
+    (data: string, options: Partial<Options>) => {
+      if (data !== qrData) setQrData(data);
+      if (JSON.stringify(options) !== JSON.stringify(baseOptions)) {
+        setBaseOptions(options);
+      }
+    },
+    [qrData, baseOptions]
+  );
 
- 
-  const [size, setSize] = useState<number>(300);
+  /** Debounced version for smoother updates */
+  const debouncedHandleControlsChange = useMemo(
+    () => debounce(handleControlsChange, 300),
+    [handleControlsChange]
+  );
 
- 
-  function handleControlsChange(data: string, options: Partial<Options>) {
-    setQrData(data ?? "");
-    setBaseOptions(options ?? {});
-  }
+  useEffect(() => {
+    return () => debouncedHandleControlsChange.cancel();
+  }, [debouncedHandleControlsChange]);
 
-  
-  function handleAdvancedSettings(settings: Partial<Options>) {
+  /** Advanced settings merge */
+  const handleAdvancedSettings = (settings: Partial<Options>) => {
     setAdvancedOptions((prev) => ({ ...prev, ...(settings || {}) }));
-  }
+  };
 
-  
+  /** Final merged QR options */
   const mergedOptions = useMemo(() => {
     const combined: Partial<Options> = {
       width: size,
       height: size,
-      
       ...baseOptions,
       ...advancedOptions,
-      
       imageOptions: {
-        ...(baseOptions?.imageOptions as Record<string, unknown> || {}),
-        ...(advancedOptions?.imageOptions as Record<string, unknown> || {}),
+        imageSize: logoData.width ? Math.min(0.3, logoData.width / size) : 0.2,
+        margin: 5,
+        ...(baseOptions.imageOptions || {}),
+        ...(advancedOptions.imageOptions || {}),
       },
     };
-
-    
-    const final = embedImageInQr(combined as Partial<Options>, logoDataUrl);
-    return final;
-  }, [baseOptions, advancedOptions, logoDataUrl, size]);
+    return embedImageInQr(
+      combined,
+      logoData.url,
+      logoData.width,
+      logoData.height
+    );
+  }, [baseOptions, advancedOptions, logoData, size]);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-indigo-900 via-purple-900 to-black text-white">
       {/* Page header */}
-      <div className="max-w-7xl mx-auto p-4 sm:p-6">
-        <motion.h1
-          initial={{ opacity: 0, y: -6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="text-center text-2xl sm:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-400 to-cyan-300 mb-4"
-        >
-          QR Code Generator
-        </motion.h1>
+<div className="max-w-7xl mx-auto p-4 sm:p-6">
+  <motion.h1
+    initial={{ opacity: 0, y: -6 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
+    className="text-center text-3xl sm:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-400 to-cyan-300 mb-1 "
+  >
+    QR Code Generator <p><span>By 𝓚</span></p>
+  </motion.h1>
+</div>
 
-        <p className="text-center text-sm text-white/70 mb-6 max-w-2xl mx-auto">
-          Create beautiful, branded QR codes — supports URL, text, Wi-Fi, vCard, email, SMS & UPI.
-          Upload a logo, tweak styles, and download as PNG / SVG / JPEG.
-        </p>
-      </div>
 
       {/* Main content */}
       <ResponsiveLayout
         left={
           <div className="space-y-6">
-            <div>
-              {/* Controls panel */}
-              <QrControls onChange={handleControlsChange} />
-            </div>
+            <QrControls onChange={debouncedHandleControlsChange} />
 
             <div className="grid grid-cols-1 gap-4">
-              {/* Logo uploader */}
-              <LogoUploader onLogoChange={(d) => setLogoDataUrl(d)} />
-
-              {/* Advanced settings */}
+              <LogoUploader
+                onLogoChange={(url, width, height) =>
+                  setLogoData({ url, width, height })
+                }
+              />
               <AdvancedSettings onSettingsChange={handleAdvancedSettings} />
 
-              {/* Size slider + quick download hint */}
+                  <GradientPresets
+              onSelect={(gradient) =>
+                setBaseOptions((prev) => ({
+                  ...prev,
+                  dotsOptions: {
+                    ...prev.dotsOptions,
+                    gradient,
+                    color: undefined,
+                  }, // replace solid
+                }))
+              }
+            />
+
+              {/* Size slider */}
               <div className="bg-white/5 p-4 rounded-2xl border border-white/20">
-                <label className="block text-sm text-white/80 mb-2">Preview size</label>
+                <label className="block text-sm text-white/80 mb-2">
+                  Preview size
+                </label>
                 <input
                   type="range"
                   min={120}
@@ -108,29 +130,24 @@ export default function QrGeneratorPage() {
                   onChange={(e) => setSize(Number(e.target.value))}
                   className="w-full"
                 />
-                <div className="mt-2 text-xs text-white/70">Size: {size}px — larger sizes are better for printing.</div>
+                <div className="mt-2 text-xs text-white/70">
+                  Size: {size}px — larger sizes are better for printing.
+                </div>
               </div>
             </div>
 
-            {/* Footer / metadata */}
-            <div className="text-xs text-white/60">
-              <div>Tip: use error correction H if you embed a large logo.</div>
-              <div className="mt-2">
-                <a href="https://github.com/yourusername" target="_blank" rel="noreferrer" className="text-white/80 hover:underline">
-                  Check out my GitHub
-                </a>
-              </div>
-            </div>
           </div>
         }
         right={
           <div className="w-full flex flex-col items-center gap-6">
+           
             {/* Preview panel */}
-            <div className="p-4 bg-white/5 rounded-2xl border border-white/20 w-full max-w-sm">
-              <QrPreview data={qrData} options={mergedOptions} />
+            <div className="p-4 bg-white/5 rounded-2xl border border-white/20 flex justify-center items-center">
+              <QrPreview data={qrData} options={mergedOptions} size={size} />
             </div>
 
-            {/* External download / share controls (note: QrPreview already has built-in download buttons) */}
+
+            {/* Extra buttons */}
             <div className="flex gap-3">
               <button
                 className="px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 hover:bg-white/20 transition text-sm"
@@ -146,11 +163,11 @@ export default function QrGeneratorPage() {
 
               <button
                 className="px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 hover:bg-white/20 transition text-sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  
-                  console.info("Use the download buttons under the QR preview to save PNG/SVG/JPEG.");
-                }}
+                onClick={() =>
+                  console.info(
+                    "Use download buttons under QR preview to save PNG/SVG/JPEG."
+                  )
+                }
               >
                 Download
               </button>

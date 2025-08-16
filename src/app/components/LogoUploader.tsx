@@ -1,81 +1,65 @@
 "use client";
 
-import { useRef, useState } from "react";
-import Image from "next/image"
+import { ChangeEvent, useState } from "react";
+import Image from "next/image";
 
 interface LogoUploaderProps {
-  onLogoChange: (logoDataUrl?: string) => void;
+  onLogoChange: (
+    dataUrl: string | undefined,
+    width?: number,
+    height?: number
+  ) => void;
 }
 
 export default function LogoUploader({ onLogoChange }: LogoUploaderProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | undefined>();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Size limit: 1MB
-    if (file.size > 1024 * 1024) {
-      alert("Please upload an image smaller than 1MB.");
-      return;
-    }
-
     const reader = new FileReader();
-    reader.onloadend = () => {
-      const dataUrl = reader.result as string;
-      setPreview(dataUrl);
-      onLogoChange(dataUrl);
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        const img = new window.Image();
+        img.onload = () => {
+          const dataUrl = event.target?.result as string;
+          setPreview(dataUrl);
+          onLogoChange(dataUrl, img.width, img.height);
+        };
+        img.src = event.target.result as string;
+      }
     };
     reader.readAsDataURL(file);
   };
 
-  const handleRemoveLogo = () => {
-    setPreview(undefined);
-    onLogoChange(undefined);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""; 
-    }
-  };
-
   return (
-    <div className="bg-white/5 p-4 rounded-2xl border border-white/20 flex flex-col gap-3">
-      <label className="text-sm text-white/80">QR Logo / Icon</label>
+    <div className="bg-white/5 p-4 rounded-2xl border border-white/20">
+      <label className="block text-sm text-white/80 mb-2">Logo</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="block w-full text-sm text-white/70 
+          file:mr-4 file:py-2 file:px-4 file:rounded-lg 
+          file:border-0 file:text-sm file:font-semibold 
+          file:bg-white/10 file:text-white 
+          hover:file:bg-white/20"
+      />
 
-      {preview ? (
-        <div className="flex flex-col items-center gap-2">
+      {preview && (
+        <div className="mt-4 w-[100px] h-[100px] relative">
+          {/* Use next/image safely with data URLs */}
           <Image
             src={preview}
-            alt="Logo Preview"
-            className="w-16 h-16 object-contain rounded bg-white/10 p-1"
+            alt="Logo preview"
+            fill
+            className="object-contain rounded-lg"
+            sizes="100px"
+            unoptimized // important for base64/dataURL images
           />
-          <button
-            onClick={handleRemoveLogo}
-            className="px-3 py-1 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 hover:bg-red-500/30 transition"
-          >
-            Remove
-          </button>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-white/60 text-sm">No logo selected</p>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="px-3 py-1 rounded-lg bg-white/10 border border-white/20 text-white hover:bg-white/20 transition"
-          >
-            Upload
-          </button>
         </div>
       )}
-
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/png,image/jpeg,image/svg+xml"
-        onChange={handleFileChange}
-        className="hidden"
-      />
     </div>
   );
 }

@@ -1,32 +1,94 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import isEqual from "lodash.isequal";
+
 
 interface QRSettings {
   dotsOptions: { type: "square" | "rounded" | "dots" | "extra-rounded" };
   cornersSquareOptions: { type: "square" | "dot" | "extra-rounded" };
   cornersDotOptions: { type: "square" | "dot" };
-  imageOptions: { imageSize: number };
+  imageOptions: { imageSize: number; hideBackgroundDots: boolean; margin: number };
 }
 
 interface AdvancedSettingsProps {
   onSettingsChange: (settings: QRSettings) => void;
 }
 
-export default function AdvancedSettings({ onSettingsChange }: AdvancedSettingsProps) {
-  const [dotsType, setDotsType] = useState<QRSettings["dotsOptions"]["type"]>("rounded");
-  const [cornerSquareType, setCornerSquareType] = useState<QRSettings["cornersSquareOptions"]["type"]>("square");
-  const [cornerDotType, setCornerDotType] = useState<QRSettings["cornersDotOptions"]["type"]>("dot");
-  const [logoSize, setLogoSize] = useState(0.2);
+const initialSettings: QRSettings = {
+  dotsOptions: { type: "rounded" },
+  cornersSquareOptions: { type: "square" },
+  cornersDotOptions: { type: "dot" },
+  imageOptions: { imageSize: 0.2, hideBackgroundDots: true, margin: 8 }
+};
 
+export default function AdvancedSettings({ onSettingsChange }: AdvancedSettingsProps) {
+  const [settings, setSettings] = useState<QRSettings>(initialSettings);
+  const prevSettingsRef = useRef<QRSettings>(initialSettings);
+
+  // Only call onSettingsChange when settings actually change
   useEffect(() => {
-    onSettingsChange({
-      dotsOptions: { type: dotsType },
-      cornersSquareOptions: { type: cornerSquareType },
-      cornersDotOptions: { type: cornerDotType },
-      imageOptions: { imageSize: logoSize },
-    });
-  }, [dotsType, cornerSquareType, cornerDotType, logoSize, onSettingsChange]);
+    if (!isEqual(settings, prevSettingsRef.current)) {
+      onSettingsChange(settings);
+      prevSettingsRef.current = settings;
+    }
+  }, [settings, onSettingsChange]);
+
+  const handleDotsTypeChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setSettings(prev => ({
+        ...prev,
+        dotsOptions: { type: e.target.value as QRSettings["dotsOptions"]["type"] }
+      }));
+    },
+    []
+  );
+
+  const handleCornerSquareTypeChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setSettings(prev => ({
+        ...prev,
+        cornersSquareOptions: { type: e.target.value as QRSettings["cornersSquareOptions"]["type"] }
+      }));
+    },
+    []
+  );
+
+  const handleCornerDotTypeChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setSettings(prev => ({
+        ...prev,
+        cornersDotOptions: { type: e.target.value as QRSettings["cornersDotOptions"]["type"] }
+      }));
+    },
+    []
+  );
+
+  const handleLogoSizeChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSettings(prev => ({
+        ...prev,
+        imageOptions: { 
+          ...prev.imageOptions,
+          imageSize: parseFloat(e.target.value) 
+        }
+      }));
+    },
+    []
+  );
+
+  const handleClearSpaceToggle = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSettings(prev => ({
+        ...prev,
+        imageOptions: { 
+          ...prev.imageOptions,
+          hideBackgroundDots: e.target.checked 
+        }
+      }));
+    },
+    []
+  );
 
   return (
     <div className="bg-white/5 p-4 rounded-2xl border border-white/20 flex flex-col gap-4">
@@ -36,10 +98,8 @@ export default function AdvancedSettings({ onSettingsChange }: AdvancedSettingsP
       <div>
         <label className="block text-xs text-white/70 mb-1">Dots Shape</label>
         <select
-          value={dotsType}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            setDotsType(e.target.value as QRSettings["dotsOptions"]["type"])
-          }
+          value={settings.dotsOptions.type}
+          onChange={handleDotsTypeChange}
           className="w-full rounded-lg border border-white/20 bg-white/10 text-white px-2 py-1"
         >
           <option value="square" className="text-gray-900">Square</option>
@@ -53,10 +113,8 @@ export default function AdvancedSettings({ onSettingsChange }: AdvancedSettingsP
       <div>
         <label className="block text-xs text-white/70 mb-1">Corner Square Shape</label>
         <select
-          value={cornerSquareType}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            setCornerSquareType(e.target.value as QRSettings["cornersSquareOptions"]["type"])
-          }
+          value={settings.cornersSquareOptions.type}
+          onChange={handleCornerSquareTypeChange}
           className="w-full rounded-lg border border-white/20 bg-white/10 text-white px-2 py-1"
         >
           <option value="square" className="text-gray-900">Square</option>
@@ -69,10 +127,8 @@ export default function AdvancedSettings({ onSettingsChange }: AdvancedSettingsP
       <div>
         <label className="block text-xs text-white/70 mb-1">Corner Dot Shape</label>
         <select
-          value={cornerDotType}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            setCornerDotType(e.target.value as QRSettings["cornersDotOptions"]["type"])
-          }
+          value={settings.cornersDotOptions.type}
+          onChange={handleCornerDotTypeChange}
           className="w-full rounded-lg border border-white/20 bg-white/10 text-white px-2 py-1"
         >
           <option value="square" className="text-gray-900">Square</option>
@@ -90,12 +146,21 @@ export default function AdvancedSettings({ onSettingsChange }: AdvancedSettingsP
           min="0.1"
           max="0.3"
           step="0.01"
-          value={logoSize}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setLogoSize(parseFloat(e.target.value))
-          }
+          value={settings.imageOptions.imageSize}
+          onChange={handleLogoSizeChange}
           className="w-full"
         />
+      </div>
+
+      {/* Clear space behind logo */}
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={settings.imageOptions.hideBackgroundDots}
+          onChange={handleClearSpaceToggle}
+          className="accent-fuchsia-500"
+        />
+        <label className="text-xs text-white/70">Clear space behind logo</label>
       </div>
     </div>
   );
