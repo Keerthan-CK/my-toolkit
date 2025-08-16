@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+#  My Productivity App
 
-## Getting Started
+<div align="center">
+  <img src="https://raw.githubusercontent.com/vercel/next.js/canary/examples/cms-wordpress/public/next-logo.svg" alt="Next.js" height="60"/>
+  <img src="https://raw.githubusercontent.com/tailwindlabs/tailwindcss/master/.github/logo-dark.svg" alt="Tailwind CSS" height="60"/>
+  <img src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-logo.svg" alt="Supabase" height="60"/>
+  <img src="https://raw.githubusercontent.com/qr-code-styling/qr-code-styling/master/media/logo.png" alt="QR Code Styling" height="60"/>
+</div>
 
-First, run the development server:
+> 🚀 A modern productivity web app built with **Next.js 15 (App Router)**, **TailwindCSS**, **Supabase**, and **TypeScript**.  
+> Includes tools like an advanced QR code generator, quick notes app, unit converters, and more.
 
+---
+
+## ✨ Features
+
+- 🎨 **Advanced QR Code Generator**
+  - Custom colors, logos, gradients, shapes
+  - Export to PNG, SVG, JPEG
+
+- 📝 **Quick Notes**
+  - Beautiful editor with **TipTap**
+  - Cloud sync with **Supabase**
+  - Image & link support
+
+- 🔢 **Converters**
+  - ⚡ Advanced unit converter (powered by `convert-units`)
+  - ⛽ Fuel converter (mileage, distance & cost)
+  - 🍳 Cooking converter (portion & measurement scaling)
+
+- 💸 **Smart Discount Calculator**
+
+- 🎭 Smooth animations with **Framer Motion**  
+- 🧩 Drag & drop with **dnd-kit**  
+- 🌌 Stylish dark UI with **TailwindCSS**  
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+  <img src="./public/screenshots/s1.png" alt="Screenshot 1" width="600"/>
+  <img src="./public/screenshots/s2.png" alt="Screenshot 2" width="600"/>
+  <img src="./public/screenshots/s3.png" alt="Screenshot 3" width="600"/>
+  <img src="./public/screenshots/s4.png" alt="Screenshot 4" width="600"/>
+  <img src="./public/screenshots/s5.png" alt="Screenshot 5" width="600"/>
+</div>
+
+---
+
+## 🛠️ Tech Stack
+
+- ⚡ [Next.js 15](https://nextjs.org/) (App Router)  
+- 🎨 [TailwindCSS](https://tailwindcss.com/)  
+- 🔐 [Supabase](https://supabase.com/) (Auth + DB)  
+- 🖼️ [QR Code Styling](https://www.npmjs.com/package/qr-code-styling)  
+- 📝 [TipTap](https://tiptap.dev/) Editor  
+- 🎭 [Framer Motion](https://www.framer.com/motion/)  
+- 🧩 [dnd-kit](https://dndkit.com/)  
+
+---
+
+## 🚀 Getting Started
+
+### Clone the repo
 ```bash
-npm run dev
+git clone https://github.com/your-username/my-productivity-app.git
+cd my-toolkit
+
+###Install dependencies
+npm install
 # or
-yarn dev
+pnpm install
 # or
-pnpm dev
-# or
-bun dev
-```
+yarn install
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+📦 Deployment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Easiest way: Deploy to Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Vercel automatically detects Next.js and sets the correct build/output.
 
-## Learn More
+🤝 Contributing
 
-To learn more about Next.js, take a look at the following resources:
+Fork the repo
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Create a feature branch (git checkout -b feature/my-feature)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Commit your changes
 
-## Deploy on Vercel
+Push to your fork
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Open a Pull Request
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+📄 License
+
+This project is licensed under the MIT License.
+(JK It's free bruv)
+
+---
+
+## :) Credits
+
+- Icons from [Flaticon](https://www.flaticon.com/) — licensed under [Flaticon License](https://www.flaticon.com/license)  
+- Fonts and brand icons from [Font Awesome](https://fontawesome.com/)  
+- Tech logos sourced from official repositories (Next.js, TailwindCSS, Supabase, etc.)
+
