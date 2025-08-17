@@ -67,33 +67,6 @@
 
 ---
 
-## 🚀 Getting Started
-
-### Clone the repo
-```bash
-git clone https://github.com/your-username/my-productivity-app.git
-cd my-productivity-app
-
-## Install dependencies
-npm install
-# or
-pnpm install
-# or
-yarn install
-
----
-
-## 📦 Deployment
-
-One-click deploy: Vercel (auto-detects Next.js).
-
-Manual deploy:
-
-npm run build
-npm run start
-
----
-
 ## 🙂 Credits
 
 Icons from Flaticon — licensed under Flaticon License
@@ -102,3 +75,27 @@ Fonts and brand icons from Font Awesome
 
 Tech logos sourced from official repositories (Next.js, TailwindCSS, Supabase, etc.)
 
+
+## 🚀 Getting Started
+
+### Clone the repo
+```bash
+git clone https://github.com/your-username/my-productivity-app.git
+cd my-productivity-app
+
+ Install dependencies
+npm install
+ or
+pnpm install
+ or
+yarn install
+
+
+📦 Deployment
+
+One-click deploy: Vercel (auto-detects Next.js).
+
+Manual deploy:
+
+npm run build
+npm run start
