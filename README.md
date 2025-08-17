@@ -1,15 +1,21 @@
-#  My Productivity App
+# My Productivity App
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/your-username/my-productivity-app/main/public/screenshots/screen1.png" alt="QR Generator" width="600" />
-  <img src="https://raw.githubusercontent.com/your-username/my-productivity-app/main/public/screenshots/screen2.png" alt="Quick Notes" width="600" />
-  <img src="https://raw.githubusercontent.com/your-username/my-productivity-app/main/public/screenshots/screen3.png" alt="Converters Hub" width="600" />
-  <img src="https://raw.githubusercontent.com/your-username/my-productivity-app/main/public/screenshots/screen4.png" alt="Discount Calculator" width="600" />
+
+[![Next.js](https://img.shields.io/badge/Next.js-15.4-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.1-61DAFB?logo=react&logoColor=white)](https://react.dev)
+[![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-2.54-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
+[![Framer Motion](https://img.shields.io/badge/Framer--Motion-12.23-ff69b4?logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vercel](https://img.shields.io/badge/Vercel-Hosting-black?logo=vercel&logoColor=white)](https://vercel.com/)
+
 </div>
 
+---
 
-> 🚀 A simple productivity/tools web app built with **Next.js 15 (App Router)**, **TailwindCSS**, **Supabase**, and **TypeScript**.  
-> Includes tools like an advanced QR code generator, quick notes app, unit converters, and more.
+> 🚀 A modern productivity toolkit built with **Next.js 15 (App Router)**, **TailwindCSS**, **Supabase**, and **TypeScript**.  
+> Includes tools like an advanced QR code generator, quick notes app, unit converters, and more — all in a sleek dark UI.
 
 ---
 
@@ -19,13 +25,13 @@
   - Custom colors, logos, gradients, shapes
   - Export to PNG, SVG, JPEG
 
-- 📝 **Quick Notes**
-  - Beautiful editor with **TipTap**
+- ✏️ **Quick Notes**
+  - Rich editor with **TipTap**
   - Cloud sync with **Supabase**
   - Image & link support
 
 - 🔢 **Converters**
-  - ⚡ Advanced unit converter (powered by `convert-units`)
+  - ⚡ Advanced unit converter (`convert-units`)
   - ⛽ Fuel converter (mileage, distance & cost)
   - 🍳 Cooking converter (portion & measurement scaling)
 
@@ -40,11 +46,11 @@
 ## 📸 Screenshots
 
 <div align="center">
-  <img src="public/screenshots/s1.png" alt="Screenshot 1" width="600"/>
-  <img src="public/screenshots/s2.png" alt="Screenshot 2" width="600"/>
-  <img src="public/screenshots/s3.png" alt="Screenshot 3" width="600"/>
-  <img src="public/screenshots/s4.png" alt="Screenshot 4" width="600"/>
-  <img src="public/screenshots/s5.png" alt="Screenshot 5" width="600"/>
+  <img src="/public/screenshots/s1.webp" alt="QR Code Generator UI" width="720"/>
+  <img src="/public/screenshots/s2.webp" alt="Notes editor with TipTap" width="720"/>
+  <img src="/public/screenshots/s3.webp" alt="Unit converter interface" width="720"/>
+  <img src="/public/screenshots/s4.webp" alt="Fuel cost calculator" width="720"/>
+  <img src="/public/screenshots/s5.webp" alt="Discount calculator with dark theme" width="720"/>
 </div>
 
 ---
@@ -66,43 +72,33 @@
 ### Clone the repo
 ```bash
 git clone https://github.com/your-username/my-productivity-app.git
-cd my-toolkit
+cd my-productivity-app
 
-###Install dependencies
+## Install dependencies
 npm install
 # or
 pnpm install
 # or
 yarn install
 
-📦 Deployment
+---
 
-Easiest way: Deploy to Vercel
+## 📦 Deployment
 
-Vercel automatically detects Next.js and sets the correct build/output.
+One-click deploy: Vercel (auto-detects Next.js).
 
-🤝 Contributing
+Manual deploy:
 
-Fork the repo
-
-Create a feature branch (git checkout -b feature/my-feature)
-
-Commit your changes
-
-Push to your fork
-
-Open a Pull Request
-
-📄 License
-
-This project is licensed under the MIT License.
-(JK It's free bruv)
+npm run build
+npm run start
 
 ---
 
-## :) Credits
+## 🙂 Credits
 
-- Icons from [Flaticon](https://www.flaticon.com/) — licensed under [Flaticon License](https://www.flaticon.com/license)  
-- Fonts and brand icons from [Font Awesome](https://fontawesome.com/)  
-- Tech logos sourced from official repositories (Next.js, TailwindCSS, Supabase, etc.)
+Icons from Flaticon — licensed under Flaticon License
+
+Fonts and brand icons from Font Awesome
+
+Tech logos sourced from official repositories (Next.js, TailwindCSS, Supabase, etc.)
 

@@ -1,3 +1,4 @@
+"use client";
 
 import React, { JSX, useEffect, useRef } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -11,31 +12,38 @@ type Props = {
   autofocus?: boolean;
 };
 
-export default function NoteEditor({ content, onChange, autofocus = true }: Props): JSX.Element | null {
-  
-  const lastEditorHTML = useRef<string | null>(null);
-  
+export default function NoteEditor({
+  content,
+  onChange,
+  autofocus = true,
+}: Props): JSX.Element | null {
   const lastSentHTML = useRef<string | null>(null);
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ codeBlock: {} }),
       Image,
-      Link.configure({ openOnClick: true }),
+      Link.configure({
+        openOnClick: true,
+        autolink: true,
+        linkOnPaste: true,
+      }),
     ],
     content,
     autofocus,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
-      
-      lastEditorHTML.current = html;
 
-      
-      if (lastSentHTML.current !== html) {
-        onChange(html);
-        lastSentHTML.current = html;
-      }
+      // Debounce propagation
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+      debounceTimer.current = setTimeout(() => {
+        if (lastSentHTML.current !== html) {
+          onChange(html);
+          lastSentHTML.current = html;
+        }
+      }, 500);
     },
   });
 
@@ -43,24 +51,31 @@ export default function NoteEditor({ content, onChange, autofocus = true }: Prop
   useEffect(() => {
     if (!editor) return;
 
-    const editorHTML = editor.getHTML();
-
-   
-    if (content === lastEditorHTML.current || content === editorHTML) {
-      
-      lastEditorHTML.current = editorHTML;
-      lastSentHTML.current = editorHTML;
-      return;
+    const current = editor.getHTML().trim();
+    if (current !== content.trim()) {
+      editor.commands.setContent(content, { emitUpdate: false });
     }
-
-   
-    editor.commands.setContent(content, { emitUpdate: false });
-
-    
-    lastEditorHTML.current = content;
-    lastSentHTML.current = content;
   }, [content, editor]);
 
+  // Ensure debounce cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, []);
+
+  // Reliable autofocus
+  useEffect(() => {
+    if (editor && autofocus) {
+      editor.commands.focus("end");
+    }
+  }, [editor, autofocus]);
+
   if (!editor) return null;
-  return <EditorContent editor={editor} />;
+
+  return (
+    <div className="prose prose-invert max-w-none">
+      <EditorContent editor={editor} />
+    </div>
+  );
 }

@@ -1,36 +1,62 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
-import useNotes from "@/app/hooks/UseNotes";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { useNotes } from "@/app/hooks/UseNotes";
 import NoteCard from "@/app/components/NoteCard";
 import NoteEditor from "@/app/components/NoteEditor";
-import { DndContext, closestCenter } from "@dnd-kit/core";
-import { arrayMove, SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
-import { motion } from "framer-motion";
-import type { DragEndEvent } from "@dnd-kit/core";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { motion } from "framer-motion";
+import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import {
+  SortableContext,
+  rectSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function NotesPage() {
-  const { notes, createNote, updateNote, deleteNote, reorderNotes } = useNotes();
+  const { notes, createNote, updateNote, deleteNote, reorderNotes } =
+    useNotes();
   const [openId, setOpenId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [draft, setDraft] = useState("");
 
-  // Filtered notes
+  const activeNote = notes.find((n) => n.id === openId) ?? null;
+
+  
+  useEffect(() => {
+    if (activeNote) {
+      const saved = localStorage.getItem(`draft-${activeNote.id}`);
+      setDraft(saved || activeNote.content || "");
+    } else {
+      setDraft("");
+    }
+  }, [activeNote]);
+
+  
+  useEffect(() => {
+    if (openId) {
+      localStorage.setItem(`draft-${openId}`, draft);
+    }
+  }, [draft, openId]);
+
+  
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return notes;
     return notes.filter(
       (n) =>
         (n.title || "").toLowerCase().includes(q) ||
-        n.content.toLowerCase().includes(q)
+        (n.content || "").toLowerCase().includes(q)
     );
   }, [notes, query]);
 
-  const onCreate = useCallback(() => {
-    const note = createNote({ content: "<p></p>" });
-    setOpenId(note.id);
+ 
+  const onCreate = useCallback(async () => {
+    const note = await createNote({ content: "<p></p>" });
+    if (note) setOpenId(note.id);
   }, [createNote]);
 
   const onOpen = (id: string) => setOpenId(id);
@@ -40,7 +66,15 @@ export default function NotesPage() {
     deleteNote(id);
   };
 
-  // Drag handlers
+  const handleClose = async () => {
+    if (activeNote) {
+      await updateNote(activeNote.id, { content: draft });
+      localStorage.removeItem(`draft-${activeNote.id}`);
+    }
+    setOpenId(null);
+  };
+
+  
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -59,74 +93,79 @@ export default function NotesPage() {
     reorderNotes(nextOrder);
   };
 
-  const activeNote = notes.find((n) => n.id === openId) ?? null;
-
   return (
-    <div className="min-h-screen px-4 sm:px-6 py-6 bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <h1 className="text-3xl sm:text-4xl font-extrabold flowing-gradient">
-          Notes
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white">
+      
+      <div className="relative w-full h-40 sm:h-72 lg:h-80 bg-gradient-to-r from-brand to-accent flex flex-col items-center justify-center text-center">
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-lg">
+          My Notes
         </h1>
-
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className="relative flex-1 sm:flex-none">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50">
-                <FontAwesomeIcon icon={faSearch} />
-              </span>
-              <input
-                placeholder="Search notes..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-full sm:w-64 pl-9 pr-3 py-2 rounded-xl bg-white/10 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-brand-light/40 shadow-inner transition"
-              />
-            </div>
-          </div>
-          <button
-            onClick={onCreate}
-            className="rounded-lg px-3 py-2 bg-gradient-to-r from-brand to-accent text-black font-semibold shadow-md hover:shadow-lg transition"
-          >
-            New
-          </button>
-        </div>
+        <p className="text-white/80 mt-2">
+          Organize your thoughts effortlessly
+        </p>
       </div>
 
-      {/* Notes grid */}
-      <div className="max-w-7xl mx-auto grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <DndContext
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={filtered.map((n) => n.id)}
-            strategy={rectSortingStrategy}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+       
+        <div className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="relative flex-1 sm:flex-none w-full sm:w-auto">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50">
+              <FontAwesomeIcon icon={faSearch} />
+            </span>
+            <input
+              placeholder="Search notes..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full sm:w-64 pl-9 pr-3 py-2 rounded-xl bg-white/10 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-brand-light/40 shadow-inner transition"
+            />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onCreate}
+              className="rounded-lg px-3 py-2 bg-gradient-to-r from-brand to-accent text-black font-semibold shadow-md hover:shadow-lg transition"
+            >
+              New
+            </button>
+          </div>
+        </div>
+
+        {/* Notes grid */}
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            {filtered.length === 0 ? (
-              <div className="col-span-full py-16 md:py-32 text-center text-white/60 flex flex-col items-center justify-center">
-                <div className="w-40 md:w-56 mb-6">
-                  <DotLottieReact
-                    src="https://lottie.host/0b238d1e-935d-45a8-af14-1899bf52f869/iSfq4aiTxy.lottie"
-                    loop
-                    autoplay
-                  />
+            <SortableContext
+              items={filtered.map((n) => n.id)}
+              strategy={rectSortingStrategy}
+            >
+              {filtered.length === 0 ? (
+                <div className="col-span-full py-16 md:py-32 text-center text-white/60 flex flex-col items-center justify-center">
+                  <div className="w-40 md:w-56 mb-6">
+                    <DotLottieReact
+                      src="https://lottie.host/0b238d1e-935d-45a8-af14-1899bf52f869/iSfq4aiTxy.lottie"
+                      loop
+                      autoplay
+                    />
+                  </div>
+                  <div className="text-lg">No notes yet, create one.</div>
                 </div>
-                <div className="text-lg">No notes yet, create one.</div>
-              </div>
-            ) : (
-              filtered.map((note) => (
-                <div key={note.id} data-note-id={note.id}>
-                  <NoteCard
-                    note={note}
-                    onOpen={onOpen}
-                    onDelete={onDelete}
-                    className="overflow-hidden break-words whitespace-normal"
-                  />
-                </div>
-              ))
-            )}
-          </SortableContext>
-        </DndContext>
+              ) : (
+                filtered.map((note) => (
+                  <div key={note.id} data-note-id={note.id}>
+                    <NoteCard
+                      note={note}
+                      onOpen={onOpen}
+                      onDelete={onDelete}
+                      className="overflow-hidden break-words whitespace-normal"
+                    />
+                  </div>
+                ))
+              )}
+            </SortableContext>
+          </DndContext>
+        </div>
       </div>
 
       {/* Editor modal */}
@@ -136,7 +175,7 @@ export default function NotesPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setOpenId(null)}
+            onClick={handleClose}
           />
           <motion.div
             initial={{ y: 20 }}
@@ -154,7 +193,7 @@ export default function NotesPage() {
                 className="text-lg sm:text-xl font-semibold bg-transparent border-none focus:outline-none text-white w-full break-words"
               />
               <button
-                onClick={() => setOpenId(null)}
+                onClick={handleClose}
                 className="px-3 py-2 rounded bg-white/10 hover:bg-white/20 transition"
               >
                 Close
@@ -163,12 +202,7 @@ export default function NotesPage() {
 
             {/* Scrollable editor area */}
             <div className="p-4 sm:p-6 overflow-y-auto">
-              <NoteEditor
-                content={activeNote.content}
-                onChange={(html) =>
-                  updateNote(activeNote.id, { content: html })
-                }
-              />
+              <NoteEditor content={draft} onChange={(html) => setDraft(html)} />
             </div>
           </motion.div>
         </div>

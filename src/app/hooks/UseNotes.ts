@@ -1,160 +1,139 @@
-import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 
 
-export type Note = {
-  id: string;
-  title?: string;
-  content: string; 
-  created_at: string; 
-  updated_at: string; 
-  order?: number;
-};
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-type NoteRow = {
+export interface Note {
   id: string;
-  title?: string | null;
-  content?: string | null;
+  title: string;
+  content: string;
   created_at: string;
-  updated_at: string;
-  order?: number | null;
-};
+  updated_at: string | null;
+}
 
-const LS_KEY = "notes.hybrid.v1";
-
-
-export default function useNotes() {
+export function useNotes() {
   const [notes, setNotes] = useState<Note[]>([]);
-  const pushQueueRef = useRef<Record<string, Note>>({});
-  const debouncedTimer = useRef<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+ 
+  const fetchNotes = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("notes")
+      .select("*")
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching notes:", error);
+      return;
+    }
+    setNotes(data || []);
+    setLoading(false);
+  }, []);
 
   
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      if (raw) {
-        const parsed: Note[] = JSON.parse(raw);
-        setNotes(parsed.sort((a,b) => (a.order ?? 0) - (b.order ?? 0)));
+  const createNote = useCallback(
+    async ({ title = "", content = "" }: { title?: string; content?: string }) => {
+      const newNote: Note = {
+        id: uuidv4(),
+        title,
+        content,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      const { data, error } = await supabase
+        .from("notes")
+        .insert(newNote)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error creating note:", error);
+        return newNote; 
       }
-    } catch (e) {
-      console.error("Failed to parse local notes", e);
+
+      setNotes((prev) => [...prev, data]);
+      return data;
+    },
+    []
+  );
+
+  
+  const updateNote = useCallback(async (id: string, fields: Partial<Note>) => {
+    const { data, error } = await supabase
+      .from("notes")
+      .update({ ...fields, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error updating note:", error);
+      return;
     }
 
+    setNotes((prev) => prev.map((n) => (n.id === id ? data : n)));
+  }, []);
 
-    (async () => {
-      try {
-        const { data, error } = await supabase.from("notes").select("*");
-        if (error) throw error;
-        if (data && data.length) {
-          
-          const cloudNotes = data.map((r: NoteRow) => ({
-            id: r.id,
-            title: r.title ?? "",
-            content: r.content ?? "",
-            created_at: r.created_at,
-            updated_at: r.updated_at,
-            order: r.order ?? 0,
-          })) as Note[];
-
-
-          
-          setNotes(prev => {
-            const map = new Map(prev.map(n => [n.id, n]));
-            for (const c of cloudNotes) {
-              const local = map.get(c.id);
-              if (!local) map.set(c.id, c);
-              else if (new Date(c.updated_at) > new Date(local.updated_at)) map.set(c.id, c);
-            }
-            const merged = Array.from(map.values()).sort((a,b)=> (a.order ?? 0) - (b.order ?? 0));
-            localStorage.setItem(LS_KEY, JSON.stringify(merged));
-            return merged;
-          });
-        }
-      } catch (err) {
-        console.warn("Supabase fetch failed (ok offline)", err);
-      }
-    })();
+  
+  const deleteNote = useCallback(async (id: string) => {
+    const { error } = await supabase.from("notes").delete().eq("id", id);
+    if (error) {
+      console.error("Error deleting note:", error);
+      return;
+    }
+    setNotes((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
 
+  const reorderNotes = useCallback((nextOrder: Note[]) => {
+    setNotes(nextOrder);
+  }, []);
+
   useEffect(() => {
-    try {
-      localStorage.setItem(LS_KEY, JSON.stringify(notes));
-    } catch (e) {
-      console.error("Failed to save notes locally", e);
-    }
-  }, [notes]);
+    fetchNotes();
 
-  
-  function schedulePush() {
-    if (debouncedTimer.current) window.clearTimeout(debouncedTimer.current);
-    debouncedTimer.current = window.setTimeout(async () => {
-      const queue = { ...pushQueueRef.current };
-      pushQueueRef.current = {};
-      const entries = Object.values(queue);
-     
-      try {
-        await supabase.from("notes").upsert(entries);
-      } catch (e) {
-        console.warn("Failed push notes", e);
-        
-        for (const n of entries) pushQueueRef.current[n.id] = n;
-      }
-    }, 800);
-  }
+    const channel = supabase
+      .channel("public:notes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "notes" },
+        (payload) => {
+          console.log("Realtime change:", payload);
 
-  function createNote(opts?: Partial<Note>) {
-    const now = new Date().toISOString();
-    const id = uuidv4();
-    const note: Note = {
-      id,
-      title: opts?.title ?? "",
-      content: opts?.content ?? "<p></p>",
-      created_at: now,
-      updated_at: now,
-      order: notes.length > 0 ? Math.max(...notes.map(n => n.order ?? 0)) + 1 : 0,
+          if (payload.eventType === "INSERT") {
+            setNotes((prev) => {
+              const exists = prev.some((n) => n.id === payload.new.id);
+              return exists ? prev : [...prev, payload.new as Note];
+            });
+          } else if (payload.eventType === "UPDATE") {
+            setNotes((prev) =>
+              prev.map((n) =>
+                n.id === payload.new.id ? (payload.new as Note) : n
+              )
+            );
+          } else if (payload.eventType === "DELETE") {
+            setNotes((prev) => prev.filter((n) => n.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
     };
-    const next = [note, ...notes];
-    setNotes(next);
-    pushQueueRef.current[note.id] = note;
-    schedulePush();
-    return note;
-  }
-
-  function updateNote(id: string, patch: Partial<Note>) {
-    setNotes(prev => {
-      const next = prev.map(n => (n.id === id ? { ...n, ...patch, updated_at: new Date().toISOString() } : n));
-      
-      const updated = next.find(n => n.id === id);
-      if (updated) pushQueueRef.current[id] = updated;
-      schedulePush();
-      return next;
-    });
-  }
-
-  function deleteNote(id: string) {
-    setNotes(prev => prev.filter(n => n.id !== id));
-    
-    (async () => {
-      try {
-        await supabase.from("notes").delete().eq("id", id);
-      } catch (e) {
-        console.warn("Failed to delete note from cloud", e);
-      }
-    })();
-  }
-
-  function reorderNotes(nextOrder: Note[]) {
-   
-    const reord = nextOrder.map((n, idx) => ({ ...n, order: idx }));
-    setNotes(reord);
-    for (const n of reord) pushQueueRef.current[n.id] = n;
-    schedulePush();
-  }
+  }, [fetchNotes]);
 
   return {
     notes,
+    loading,
     createNote,
     updateNote,
     deleteNote,
